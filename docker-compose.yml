@@ -1,0 +1,26 @@
+services:
+    database:
+        image: mongo:4.4
+        ports:
+            - 27017:27017
+        container_name: mongo-api-ts
+        volumes:
+            - ./.database:/data/db
+        networks:
+            - api-ts-network
+
+    app:
+        build: .
+        ports:
+            - 3388:3388
+        container_name: api-node-ts
+        depends_on:
+            - database
+        volumes:
+            - .:/app
+        networks:
+            - api-ts-network
+
+networks:
+    api-ts-network:
+        driver: bridge

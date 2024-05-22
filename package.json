@@ -1,0 +1,31 @@
+{
+  "name": "api-ts-mongo",
+  "version": "1.0.0",
+  "description": "Api criada com typescript e mongoDB seguindo o curso da Udemy",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --ignore-watch node_modules src/server.ts",
+    "build": "npx tsc",
+    "start": "npm run build && node dist/server.js"
+  },
+  "keywords": [],
+  "author": {
+    "name": "José Guilherme",
+    "email": "joseguilhermesorio@gmail.com"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.4.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^20.12.12",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  }
+}
