@@ -22,13 +22,13 @@ class NewsController {
                 title: z.string(),
                 content: z.string(),
                 author: z.string(),
-                image: z.string(),
                 published: z.date().default(new Date()),
                 active: z.boolean().default(true),
                 link: z.string().optional()
             });
-
-            const { hat, title, content, author, image, published, link, active } = bodySchema.parse(req.body);
+            
+            const { hat, title, content, author, published, link, active } = bodySchema.parse(req.body);
+            const image: string = req.file?.filename;
             const news = await NewsService.create({ hat, title, content, author, image, published, link, active });
             return res.status(201).json(news);
         } catch (error) {
