@@ -9,6 +9,7 @@ class NewsController {
     async getAll(req: Request, res: Response) {
         const client = connection();
         client.connect();
+        client.expire('news', 120);
         const cachedNews = await client.get('news');
         if (cachedNews) return res.json(JSON.parse(cachedNews));
 
@@ -26,17 +27,7 @@ class NewsController {
 
     async create(req: Request, res: Response) {
         try {
-            const bodySchema = z.object({
-                hat: z.string(),
-                title: z.string(),
-                content: z.string(),
-                author: z.string(),
-                published: z.date().default(new Date()),
-                active: z.boolean().default(true),
-                link: z.string().optional()
-            });
-            
-            const { hat, title, content, author, published, link, active } = bodySchema.parse(req.body);
+            const { hat, title, content, author, published, link, active } = req.body;
             const image: string = req.file?.filename;
             const news = await NewsService.create({ hat, title, content, author, image, published, link, active });
             const client = connection();
@@ -52,19 +43,10 @@ class NewsController {
     async update(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const bodySchema = z.object({
-                hat: z.string(),
-                title: z.string(),
-                content: z.string(),
-                author: z.string(),
-                published: z.date().default(new Date()),
-                link: z.string().optional(),
-                active: z.boolean().default(true)
-            });
             const findNews = await NewsService.getById(id);
             unlink(`${path.resolve(__dirname, '..', '..', 'uploads', `${findNews.image}`)}`, () => {});
             const image: string = req.file?.filename;
-            const { hat, title, content, author, published, link, active } = bodySchema.parse(req.body);
+            const { hat, title, content, author, published, link, active } = req.body;
             const news = await NewsService.update(id, { hat, title, content, author, image, published, link, active });
             const client = connection();
             client.connect();
