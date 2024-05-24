@@ -21,6 +21,14 @@ services:
         networks:
             - api-ts-network
 
+    redis:
+        image: redis
+        container_name: redis-api-ts
+        ports:
+            - 6379:6379
+        networks:
+            - api-ts-network
+
 networks:
     api-ts-network:
         driver: bridge

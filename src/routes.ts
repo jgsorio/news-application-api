@@ -5,7 +5,7 @@ import UserController from "./controllers/UserController";
 import LoginController from "./controllers/LoginController";
 import { config } from 'dotenv';
 import multer from 'multer';
-import storage from './helpers/storage';
+import storage from "./helpers/storage";
 
 config();
 
@@ -19,7 +19,7 @@ router.post('/login', LoginController.login);
 router.get('/news', Auth, NewsController.getAll);
 router.get('/news/:id', Auth, NewsController.getById);    
 router.post('/news', Auth, upload.single('image'),  NewsController.create);    
-router.put('/news/:id', Auth, NewsController.update); 
+router.put('/news/:id', Auth, upload.single('image'), NewsController.update); 
 router.delete('/news/:id', Auth, NewsController.delete);
 
 export default router;

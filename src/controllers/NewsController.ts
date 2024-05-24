@@ -1,10 +1,19 @@
 import { Request, Response } from 'express';
 import NewsService from '../services/NewsService';
 import z from 'zod';
+import { unlink } from 'fs';
+import path from 'path';
+import { connection } from '../helpers/redis';
 
 class NewsController {
     async getAll(req: Request, res: Response) {
+        const client = connection();
+        client.connect();
+        const cachedNews = await client.get('news');
+        if (cachedNews) return res.json(JSON.parse(cachedNews));
+
         const news = await NewsService.getAll();
+        client.set('news', JSON.stringify(news));
         return res.json(news);
     }
 
@@ -30,6 +39,10 @@ class NewsController {
             const { hat, title, content, author, published, link, active } = bodySchema.parse(req.body);
             const image: string = req.file?.filename;
             const news = await NewsService.create({ hat, title, content, author, image, published, link, active });
+            const client = connection();
+            client.connect();
+            const cachedNews = await client.get('news');
+            client.set('news', JSON.stringify([news, ...JSON.parse(cachedNews)]));
             return res.status(201).json(news);
         } catch (error) {
             return res.status(400).json({ message: error });
@@ -44,14 +57,19 @@ class NewsController {
                 title: z.string(),
                 content: z.string(),
                 author: z.string(),
-                image: z.string(),
                 published: z.date().default(new Date()),
                 link: z.string().optional(),
                 active: z.boolean().default(true)
             });
-
-            const { hat, title, content, author, image, published, link, active } = bodySchema.parse(req.body);
+            const findNews = await NewsService.getById(id);
+            unlink(`${path.resolve(__dirname, '..', '..', 'uploads', `${findNews.image}`)}`, () => {});
+            const image: string = req.file?.filename;
+            const { hat, title, content, author, published, link, active } = bodySchema.parse(req.body);
             const news = await NewsService.update(id, { hat, title, content, author, image, published, link, active });
+            const client = connection();
+            client.connect();
+            const cachedNews = await client.get('news');
+            client.set('news', JSON.stringify([news, ...JSON.parse(cachedNews)]));
             return res.json(news);
         } catch (error) {
             return res.status(400).json({ message: error });
