@@ -4,6 +4,13 @@ import UserService from '../services/UserService';
 import bcrypt from 'bcrypt';
 
 class UserController {
+
+    async get(req: Request, res: Response) {
+        const emailUser: any = req.headers['userEmail'];
+        const { name, email } = await UserService.get(emailUser);
+        return res.status(200).json({ name, email });
+    }
+
     async create(req: Request, res: Response) {
         const bodySchema = z.object({
             name: z.string(),

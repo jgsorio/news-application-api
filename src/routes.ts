@@ -13,10 +13,13 @@ const router = Router();
 
 const upload = multer({ storage: storage });
 
+router.get('/status', (req, res) => res.send('OK'));
+
 router.post('/register', UserController.create);
 router.post('/login', LoginController.login);
+router.get('/user', Auth, UserController.get);
 
-router.get('/news', Auth, NewsController.getAll);
+router.get('/news', NewsController.getAll);
 router.get('/news/:id', Auth, NewsController.getById);    
 router.post('/news', Auth, upload.single('image'),  NewsController.create);    
 router.put('/news/:id', Auth, upload.single('image'), NewsController.update); 
