@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 import NewsService from '../services/NewsService';
-import z from 'zod';
-import { unlink } from 'fs';
 import path from 'path';
 import { connection } from '../helpers/redis';
 
@@ -28,8 +26,8 @@ class NewsController {
     async create(req: Request, res: Response) {
         try {
             const { hat, title, content, author, published, link, active } = req.body;
-            const image: string = req.file?.filename;
-            const news = await NewsService.create({ hat, title, content, author, image, published, link, active });
+            const imageUpload: any = req.file;
+            const news = await NewsService.create({ hat, title, content, author, image: imageUpload.location, published, link, active });
             const client = connection();
             client.connect();
             const cachedNews = await client.get('news');
@@ -44,10 +42,9 @@ class NewsController {
         try {
             const { id } = req.params;
             const findNews = await NewsService.getById(id);
-            unlink(`${path.resolve(__dirname, '..', '..', 'uploads', `${findNews.image}`)}`, () => {});
-            const image: string = req.file?.filename;
+            const imageUpload: any = req.file;
             const { hat, title, content, author, published, link, active } = req.body;
-            const news = await NewsService.update(id, { hat, title, content, author, image, published, link, active });
+            const news = await NewsService.update(id, { hat, title, content, author, image: imageUpload ? imageUpload.location : findNews.image, published, link, active });
             const client = connection();
             client.connect();
             const cachedNews = await client.get('news');

@@ -11,6 +11,13 @@ class UserController {
         return res.status(200).json({ name, email });
     }
 
+    async getAll(req: Request, res: Response) {
+        const emailUser: any = req.headers['userEmail'];
+        const { name } = await UserService.get(emailUser);
+        const users = await UserService.getAll(name);
+        return res.status(200).json(users);
+    }
+
     async create(req: Request, res: Response) {
         const bodySchema = z.object({
             name: z.string(),

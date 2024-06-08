@@ -18,6 +18,7 @@ router.get('/status', (req, res) => res.send('OK'));
 router.post('/register', UserController.create);
 router.post('/login', LoginController.login);
 router.get('/user', Auth, UserController.get);
+router.get('/user/posts', Auth, UserController.getAll);
 
 router.get('/news', NewsController.getAll);
 router.get('/news/:id', Auth, NewsController.getById);    
